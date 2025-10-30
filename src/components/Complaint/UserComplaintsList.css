@@ -1,0 +1,365 @@
+/* src/components/Complaint/UserComplaintsList.css */
+
+/* Loading Container */
+.ucl-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 200px;
+}
+
+.ucl-loader-wrapper {
+  margin-bottom: 20px;
+}
+
+/* Error Container */
+.ucl-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #ff6b6b;
+}
+
+/* Empty Container */
+.ucl-empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* Stats */
+.ucl-header {
+  margin-bottom: 30px;
+}
+
+.ucl-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ucl-stat {
+  background: rgba(74, 222, 128, 0.1);
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  font-weight: 600;
+}
+
+/* Grid Layout */
+.ucl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* Card Styles */
+.ucl-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ucl-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 10px 25px rgba(74, 222, 128, 0.2),
+    inset 0 0 20px rgba(74, 222, 128, 0.1);
+}
+
+/* Badges */
+.ucl-badges {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.ucl-priority-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #00d4ff;
+  color: #0a0a0a;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ucl-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+/* Content */
+.ucl-content {
+  position: relative;
+}
+
+.ucl-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.ucl-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.ucl-category {
+  background: rgba(74, 222, 128, 0.1);
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.ucl-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Description */
+.ucl-desc-wrapper {
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.ucl-desc {
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ucl-desc.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ucl-desc.expanded {
+  display: block;
+}
+
+/* Image */
+.ucl-image-container {
+  margin: 15px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.ucl-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ucl-image-fallback {
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Expand Button */
+.ucl-expand-btn {
+  background: none;
+  border: none;
+  color: #4ade80;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 0;
+  margin: 10px 0;
+  transition: color 0.3s ease;
+}
+
+.ucl-expand-btn:hover {
+  color: #22d3ee;
+  text-decoration: underline;
+}
+
+/* Actions */
+.ucl-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(74, 222, 128, 0.1);
+}
+
+.ucl-edit-btn,
+.ucl-delete-btn {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ucl-edit-btn {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.ucl-edit-btn:hover {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.ucl-delete-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.ucl-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.ucl-action-disabled {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Modal */
+.ucl-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.ucl-modal {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  max-width: 400px;
+  width: 90%;
+  overflow: hidden;
+}
+
+.ucl-modal-content {
+  padding: 30px;
+}
+
+.ucl-modal-content h3 {
+  color: #e2e8f0;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.ucl-modal-content p {
+  color: #94a3b8;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.ucl-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.ucl-btn-cancel,
+.ucl-btn-delete {
+  flex: 1;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ucl-btn-cancel {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.ucl-btn-cancel:hover {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.ucl-btn-delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.ucl-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .ucl-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ucl-stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .ucl-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .ucl-actions {
+    flex-direction: column;
+  }
+  
+  .ucl-modal-content {
+    padding: 20px;
+  }
+}
