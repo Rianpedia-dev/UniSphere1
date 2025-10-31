@@ -18,6 +18,7 @@ function ForumPost({ post }) {
   const [animatingReaction, setAnimatingReaction] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
   const [sparkles, setSparkles] = useState([]);
+  const [localReactions, setLocalReactions] = useState(post.reactions || {});
   // Pastikan post.id tersedia sebelum memanggil hook
   const postId = post?.id;
   
@@ -47,6 +48,15 @@ function ForumPost({ post }) {
   const handleReaction = async (reactionType) => {
     if (!user) return;
     
+    // Update local state first for instant feedback
+    setLocalReactions(prev => {
+      const currentCount = prev[reactionType] || 0;
+      return {
+        ...prev,
+        [reactionType]: currentCount + 1
+      };
+    });
+    
     setAnimatingReaction(reactionType);
     
     // Create sparkle effect
@@ -66,7 +76,14 @@ function ForumPost({ post }) {
       await addReaction(post.id, reactionType);
     } catch (error) {
       console.error('Error adding reaction:', error);
-      // Jangan biarkan error reaksi menghentikan fungsi lain
+      // Rollback local state if server update fails
+      setLocalReactions(prev => {
+        const currentCount = prev[reactionType] || 0;
+        return {
+          ...prev,
+          [reactionType]: Math.max(0, currentCount - 1)
+        };
+      });
     }
   };
 
@@ -138,7 +155,7 @@ function ForumPost({ post }) {
     setShowShareMenu(false);
   };
 
-  const reactions = post.reactions || {};
+  const reactions = { ...post.reactions, ...localReactions }; // Gabungkan reaksi dari props dan lokal
   const authorName = post.is_anonymous ? 'Anonymous' : (post.user?.username || 'User');
   const totalReactions = Object.values(reactions).reduce((sum, count) => sum + count, 0);
   const isHotPost = totalReactions > 10 || (post.comment_count || 0) > 5;

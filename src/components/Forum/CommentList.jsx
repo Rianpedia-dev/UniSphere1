@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MessageCircle, Loader, AlertCircle } from 'lucide-react';
+import LoadingScreen from '../common/LoadingScreen.jsx';
 import Comment from './Comment.jsx';
 import CommentForm from './CommentForm.jsx';
 import './CommentList.css';
@@ -91,10 +92,7 @@ function CommentList({
 
       {/* Loading state - hanya tampilkan jika loading dan belum ada komentar */}
       {loading && comments.length === 0 ? (
-        <div className="cml-loading">
-          <Loader className="cml-spinner spin-animation" size={32} />
-          <p>Loading comments...</p>
-        </div>
+        <LoadingScreen />
       ) : (
         <>
           {comments && comments.length > 0 ? (

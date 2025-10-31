@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Users, MessageCircle, TrendingUp, Calendar, Activity, Loader, Sparkles, Zap, AlertCircle } from 'lucide-react';
+import { Users, MessageCircle, TrendingUp, Calendar, Activity, Sparkles, Zap, AlertCircle } from 'lucide-react';
+import LoadingScreen from '../../components/common/LoadingScreen.jsx';
 import { useAdmin } from '../../hooks/useAdmin';
 import './AdminDashboard.css';
 import LineChart from './Charts/LineChart.jsx';
@@ -37,24 +38,7 @@ function AdminDashboard() {
   };
 
   if (loading && !analytics.totalUsers) {
-    return (
-      <div className="admin-dashboard-v2 dash-loading">
-        <div className="dash-loading-container">
-          <div className="dash-loading-spinner">
-            <Loader className="dash-spinner-icon" size={48} />
-            <div className="dash-loading-ring"></div>
-          </div>
-          <p className="dash-loading-text">
-            <Sparkles size={16} className="dash-loading-sparkle" />
-            Loading Analytics...
-            <Sparkles size={16} className="dash-loading-sparkle" />
-          </p>
-          <div className="dash-loading-bar">
-            <div className="dash-loading-progress"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (error) {

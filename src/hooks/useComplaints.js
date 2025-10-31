@@ -1,21 +1,27 @@
 // src/hooks/useComplaints.js
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../utils/supabase';
-import { useImageUpload } from './useImageUpload';
 
-export const useComplaints = () => {
+export const useComplaints = (userId = null) => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { uploadImage } = useImageUpload();
 
   // Load complaints for current user
   const loadComplaints = useCallback(async () => {
+    if (!userId) {
+      setError('User ID is required to load complaints');
+      return;
+    }
+
     setLoading(true);
+    setError(null);
+    
     try {
       const { data, error } = await supabase
         .from('complaints')
         .select('*')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -26,13 +32,14 @@ export const useComplaints = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   // Load all complaints (for admin)
   const loadAllComplaints = useCallback(async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      // Ambil semua komentar terlebih dahulu
       const { data: complaintsData, error } = await supabase
         .from('complaints')
         .select('*')
@@ -40,7 +47,7 @@ export const useComplaints = () => {
 
       if (error) throw error;
 
-      // Ambil informasi profil untuk setiap komentar
+      // Fetch user profiles for each complaint
       const complaintsWithProfiles = await Promise.all(
         complaintsData.map(async (complaint) => {
           if (complaint.user_id) {
@@ -79,34 +86,16 @@ export const useComplaints = () => {
   // Add new complaint
   const addComplaint = useCallback(async (complaintData) => {
     setLoading(true);
+    setError(null);
+    
     try {
-      let imageUrl = null;
-      
-      // Upload image if provided
-      if (complaintData.imageFile) {
-        try {
-          // Upload to 'complaints-evidence' bucket with user ID as first folder and 'complaint-images' as subfolder
-          imageUrl = await uploadImage(
-            complaintData.imageFile,   // file
-            `complaint-images`,        // folderPath
-            complaintData.user_id,     // userId 
-            'complaints-evidence'      // bucketName
-          );
-        } catch (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          // Jika upload gagal karena bucket tidak ditemukan, kita tetap lanjutkan tanpa gambar
-          // atau kita bisa throw error untuk memberitahu pengguna
-          throw new Error(`Failed to upload image: ${uploadError.message}`);
-        }
-      }
-
       const { data, error } = await supabase
         .from('complaints')
         .insert([{
           user_id: complaintData.user_id,
           title: complaintData.title,
           description: complaintData.description,
-          image_url: imageUrl,
+          image_url: complaintData.image_url,
           category: complaintData.category || 'general',
           priority: complaintData.priority || 'medium'
         }])
@@ -125,7 +114,7 @@ export const useComplaints = () => {
     } finally {
       setLoading(false);
     }
-  }, [uploadImage]);
+  }, []);
 
   // Update complaint (for admin)
   const updateComplaint = useCallback(async (complaintId, updateData) => {
@@ -139,7 +128,7 @@ export const useComplaints = () => {
 
       if (error) throw error;
 
-      // Ambil informasi profil untuk komentar yang diperbarui
+      // Fetch user profile for updated complaint
       let complaintWithProfile = { ...updatedComplaint, user: null };
       
       if (updatedComplaint.user_id) {

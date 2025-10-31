@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useComplaints } from '../../hooks/useComplaints';
 import { AlertCircle, CheckCircle, Clock, XCircle, Search, Filter, Eye, Edit, User, Calendar, AlertTriangle, ArrowUpDown, Zap, TrendingUp, Activity } from 'lucide-react';
+import LoadingScreen from '../../components/common/LoadingScreen.jsx';
+import ComplaintList from '../../components/Complaint/ComplaintList.jsx';
 import './AdminComplaintsPage.css';
 
 function AdminComplaintsPage() {
@@ -347,15 +349,7 @@ function AdminComplaintsPage() {
       {/* Complaints Display */}
       <div className="acp-content">
         {complaintsLoading ? (
-          <div className="acp-loading-state">
-            <div className="acp-loader">
-              <div className="acp-loader-ring"></div>
-              <div className="acp-loader-ring"></div>
-              <div className="acp-loader-ring"></div>
-              <Zap className="acp-loader-icon" size={32} />
-            </div>
-            <p className="acp-loading-text">Loading complaints...</p>
-          </div>
+          <LoadingScreen />
         ) : filteredComplaints.length === 0 ? (
           <div className="acp-empty-state">
             <div className="acp-empty-icon">

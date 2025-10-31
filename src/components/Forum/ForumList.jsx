@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import ForumPost from '../Forum/ForumPost.jsx';
-import { Plus, Loader, Sparkles, MessageSquare, TrendingUp, X } from 'lucide-react';
-import { useForum } from '../../hooks/useForum';
+import { Plus, Sparkles, MessageSquare, TrendingUp, X } from 'lucide-react';
+import LoadingScreen from '../common/LoadingScreen.jsx';
 import { useAuth } from '../../hooks/useAuth';
 import './ForumList.css';
 
 function ForumList({ 
+  posts,
+  loading,
+  error,
   showCreateForm = false, 
   setShowCreateForm = () => {}, 
   newPost = { title: '', content: '', category: '' }, 
@@ -13,7 +16,6 @@ function ForumList({
   handleCreatePost = () => {},
   isCreating = false 
 }) {
-  const { posts, loading, error } = useForum();
   const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -156,7 +158,7 @@ function ForumList({
                 >
                   {isCreating ? (
                     <>
-                      <Loader className="spin-animation" size={20} />
+                      <div className="cp-spin cp-spinner-inline" style={{width: '20px', height: '20px'}}></div>
                       <span>Posting...</span>
                     </>
                   ) : (
@@ -182,15 +184,7 @@ function ForumList({
       
       {/* Posts List */}
       {loading && !posts.length ? (
-        <div className="forum-loading">
-          <Loader className="spin-animation" size={48} />
-          <p className="loading-text">Loading awesome content...</p>
-          <div className="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
+        <LoadingScreen />
       ) : (
         <div className="forum-posts-grid">
           {filteredPosts.map((post, index) => (
@@ -199,7 +193,7 @@ function ForumList({
               className="forum-post-wrapper"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <ForumPost post={post} />
+              <ForumPost post={post} key={post.id} />
             </div>
           ))}
         </div>

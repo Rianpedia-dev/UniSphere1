@@ -1,14 +1,16 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect, Component, Suspense } from 'react';
 import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { Loader, AlertCircle } from 'lucide-react';
-import Home from './pages/Home/Home.jsx';
-import ChatPage from './pages/Chat/ChatPage.jsx';
-import ForumPage from './pages/Forum/ForumPage.jsx';
-import AdminPage from './pages/Admin/AdminPage.jsx';
-import ComplaintPage from './pages/Complaint/ComplaintPage.jsx';
-import Login from './components/Auth/Login.jsx';
-import Profile from './components/Auth/Profile.jsx';
+import { AlertCircle } from 'lucide-react';
+import LoadingScreen from './components/common/LoadingScreen.jsx';
+
+const Home = React.lazy(() => import('./pages/Home/Home.jsx'));
+const ChatPage = React.lazy(() => import('./pages/Chat/ChatPage.jsx'));
+const ForumPage = React.lazy(() => import('./pages/Forum/ForumPage.jsx'));
+const AdminPage = React.lazy(() => import('./pages/Admin/AdminPage.jsx'));
+const ComplaintPage = React.lazy(() => import('./pages/Complaint/ComplaintPage.jsx'));
+const Login = React.lazy(() => import('./components/Auth/Login.jsx'));
+const Profile = React.lazy(() => import('./components/Auth/Profile.jsx'));
 import Navbar from './components/common/Navbar.jsx';
 import ScrollToTop from './components/common/ScrollToTop.jsx';
 import './index.css';
@@ -58,43 +60,6 @@ class AppErrorBoundary extends Component {
 
     return this.props.children;
   }
-}
-
-function LoadingScreen() {
-  // Static loading screen with no dynamic elements to prevent DOM issues
-  return (
-    <div className="unisphere-loading-container">
-      <div className="unisphere-loading-content">
-        <div className="unisphere-loading-spinner">
-          <Loader size={48} />
-          <div className="unisphere-loading-ring"></div>
-          <div className="unisphere-loading-ring unisphere-ring-2"></div>
-        </div>
-        <h2 className="unisphere-loading-text">
-          Loading UniSphere
-        </h2>
-        <p className="unisphere-loading-subtitle">Initializing your mental health companion</p>
-      </div>
-      {/* Fixed particles with static positions to prevent DOM manipulation issues */}
-      <div className="unisphere-loading-bg">
-        <div className="unisphere-loading-particle" style={{left: '10%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '20%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '30%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '40%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '50%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '60%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '70%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '80%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '90%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '15%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '25%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '35%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '45%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '55%'}}></div>
-        <div className="unisphere-loading-particle" style={{left: '65%'}}></div>
-      </div>
-    </div>
-  );
 }
 function ErrorScreen({ error }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -172,15 +137,17 @@ function App() {
         <Navbar user={user} signOut={signOut} />
         
         <main className={`unisphere-main-content ${pageTransition ? 'transitioning' : ''}`}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/chat" element={user ? <ChatPage /> : <Navigate to="/login" />} />
-            <Route path="/forum" element={<ForumPage />} />
-            <Route path="/complaints" element={user ? <ComplaintPage /> : <Navigate to="/login" />} />
-            <Route path="/admin" element={user ? <AdminPage /> : <Navigate to="/login" />} />
-            <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
-            <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" replace />} />
-          </Routes>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/chat" element={user ? <ChatPage /> : <Navigate to="/login" />} />
+              <Route path="/forum" element={<ForumPage />} />
+              <Route path="/complaints" element={user ? <ComplaintPage /> : <Navigate to="/login" />} />
+              <Route path="/admin" element={user ? <AdminPage /> : <Navigate to="/login" />} />
+              <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
+              <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" replace />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </AppErrorBoundary>

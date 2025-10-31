@@ -13,7 +13,7 @@ export const useForum = () => {
     
     // Set up real-time subscription
     const subscription = supabase
-      .channel('forum-posts-updates')
+      .channel('forum-posts-updates', { config: { broadcast: { self: false } } })
       .on(
         'postgres_changes',
         {
@@ -21,14 +21,34 @@ export const useForum = () => {
           schema: 'public',
           table: 'forum_posts'
         },
-        (payload) => {
-          // Tidak bisa fetch user info secara async di sini, jadi kita gunakan null dulu
-          // User info akan diambil saat loadPosts dipanggil lagi
+        async (payload) => {
+          let user = null;
+          if (payload.new.user_id && !payload.new.is_anonymous) {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('username, avatar_url')
+              .eq('id', payload.new.user_id)
+              .maybeSingle();
+            
+            if (profileError) {
+              console.error('Error fetching profile for real-time post:', profileError);
+            } else {
+              user = profileData;
+            }
+          }
           const postWithUserInfo = {
             ...payload.new,
-            user: null
+            user: user
           };
-          setPosts(prev => [postWithUserInfo, ...prev]);
+          setPosts(prev => {
+            console.log('Real-time event received:', postWithUserInfo.id);
+            if (prev.find(p => p.id === postWithUserInfo.id)) {
+              console.log('Duplicate found in real-time. Ignoring.');
+              return prev;
+            }
+            console.log('Adding post from real-time.');
+            return [postWithUserInfo, ...prev];
+          });
         }
       )
       .on(
@@ -146,7 +166,15 @@ export const useForum = () => {
         user: user
       };
       
-      setPosts(prev => [postWithUserInfo, ...prev]);
+      setPosts(prev => {
+        console.log('Manual update after createPost:', postWithUserInfo.id);
+        if (prev.find(p => p.id === postWithUserInfo.id)) {
+          console.log('Duplicate found in createPost. Ignoring.');
+          return prev;
+        }
+        console.log('Adding post from createPost.');
+        return [postWithUserInfo, ...prev];
+      });
       return data;
     } catch (err) {
       setError(err.message);
@@ -202,8 +230,23 @@ export const useForum = () => {
   };
 
   const addReaction = async (postId, reactionType) => {
+    // Update local state immediately for better UX
+    setPosts(prev => 
+      prev.map(post => {
+        if (post.id === postId) {
+          const currentReactions = post.reactions || {};
+          const updatedReactions = {
+            ...currentReactions,
+            [reactionType]: (currentReactions[reactionType] || 0) + 1
+          };
+          return { ...post, reactions: updatedReactions };
+        }
+        return post;
+      })
+    );
+    
     try {
-      // Get current post data
+      // Then update on server
       const { data: currentPost, error: selectError } = await supabase
         .from('forum_posts')
         .select('reactions')
@@ -218,8 +261,27 @@ export const useForum = () => {
         [reactionType]: (currentReactions[reactionType] || 0) + 1
       };
 
-      await updatePost(postId, { reactions: updatedReactions });
+      const { error: updateError } = await supabase
+        .from('forum_posts')
+        .update({ reactions: updatedReactions })
+        .eq('id', postId);
+
+      if (updateError) throw updateError;
     } catch (err) {
+      // Rollback the local update if server update fails
+      setPosts(prev => 
+        prev.map(post => {
+          if (post.id === postId) {
+            const currentReactions = post.reactions || {};
+            const updatedReactions = {
+              ...currentReactions,
+              [reactionType]: Math.max(0, (currentReactions[reactionType] || 0) - 1)
+            };
+            return { ...post, reactions: updatedReactions };
+          }
+          return post;
+        })
+      );
       setError(err.message);
       console.error('Error adding reaction:', err);
       throw err;

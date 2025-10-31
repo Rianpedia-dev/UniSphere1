@@ -58,6 +58,7 @@ export const useAuth = () => {
           return null;
         }
       }
+
       return data;
     } catch (error) {
       console.error('Error in fetchProfile:', error);
@@ -211,17 +212,25 @@ export const useAuth = () => {
     if (error) throw error;
 
     if (isMountedRef.current) {
-      setUser((currentUser) => ({
-        ...currentUser,
+      const updatedProfile = { ...data };
+
+      if (updatedProfile.avatar_url) {
+        const baseUrl = updatedProfile.avatar_url.split('?')[0];
+        updatedProfile.avatar_url = `${baseUrl}?t=${new Date().getTime()}`;
+      }
+
+      const newUser = {
+        ...user,
         user_metadata: {
-          ...currentUser.user_metadata,
-          ...data,
+          ...user.user_metadata,
+          ...updatedProfile,
         },
-      }));
+      };
+      setUser(newUser);
     }
 
     return data;
-  }, [user?.id]);
+  }, [user, isMountedRef]);
 
   return {
     user,

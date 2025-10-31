@@ -10,7 +10,7 @@ function ForumPage() {
   const [glitchText, setGlitchText] = useState('Support Forum');
   const [floatingEmojis, setFloatingEmojis] = useState([]);
   const { user } = useAuth();
-  const { createPost } = useForum();
+  const { posts, loading, error, createPost } = useForum();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', content: '', category: '' });
   const [isCreating, setIsCreating] = useState(false);
@@ -123,6 +123,9 @@ function ForumPage() {
           <div className="forum-corner forum-corner-br"></div>
           
           <ForumList 
+            posts={posts}
+            loading={loading}
+            error={error}
             showCreateForm={showCreateForm}
             setShowCreateForm={setShowCreateForm}
             newPost={newPost}

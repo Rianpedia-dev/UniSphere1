@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { generateAvatarColor } from '../../utils/helpers';
 import { Edit3, Save, X, LogOut, Mail, Calendar, Sparkles, User, FileText, Shield, Award, Zap } from 'lucide-react';
@@ -64,6 +64,17 @@ function Profile() {
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState('');
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        username: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
+        full_name: user?.user_metadata?.full_name || '',
+        bio: user?.user_metadata?.bio || '',
+        avatar_url: user?.user_metadata?.avatar_url || ''
+      });
+    }
+  }, [user]);
 
   const handleSave = async () => {
     setLoading(true);

@@ -115,6 +115,11 @@
   to { transform: rotate(360deg); }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @keyframes cp-pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.05); opacity: 0.8; }
@@ -430,6 +435,16 @@
 }
 
 .cp-spin {
+  animation: cp-spin 1s linear infinite;
+}
+
+.cp-spinner-inline {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  display: inline-block;
   animation: cp-spin 1s linear infinite;
 }
 
